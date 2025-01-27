@@ -30,7 +30,14 @@
           ./msget.sh extensions.txt
         '';
       };
-      # To run something each time the workspace is (re)started, use the `onStart` hook
+      # Runs when a workspace restarted
+      onStart = {
+        msget = ''
+          cd ./msget
+          chmod +x ./msget.sh
+          ./msget.sh extensions.txt
+        '';
+      };
     };
     # Enable previews and customize configuration
     previews = {
