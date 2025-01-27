@@ -1,36 +1,24 @@
-import { useState } from "react";
 import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <h1 className="text-3xl font-bold text-red-500 underline">
         Hello world!
       </h1>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="flex flex-col gap-2 p-8 sm:flex-row sm:items-center sm:gap-6 sm:py-4 ...">
+        <img className="mx-auto block h-24 rounded-full sm:mx-0 sm:shrink-0" src={reactLogo} alt="" />
+        <div className="space-y-2 text-center sm:text-left">
+          <div className="space-y-0.5">
+            <p className="text-lg font-semibold text-black">Erin Lindford</p>
+            <p className="font-medium text-gray-500">Product Engineer</p>
+          </div>
+          <button className="border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 ...">
+            Message
+          </button>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 2)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <button className="bg-sky-500 hover:bg-sky-700 ...">Save changes</button>
     </>
   );
 }
