@@ -1,0 +1,3 @@
+rodrigovallades.es7-react-js-snippets
+AlDuncanson.react-hooks-snippets
+planbcoding.vscode-react-refactor
