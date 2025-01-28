@@ -9,10 +9,11 @@ import { Search } from 'lucide-react';
 import { useState } from 'react';
 import RecommendationInterface from './recommendation-interface';
 import ChatInterface from './chat-interface';
+import { Chat } from '../data';
 
 
 interface ChatLayoutProps {
-	// chats: Chat[]
+	chats: Chat[]
 	defaultLayout: number[] | undefined
 	defaultCollapsed?: boolean
 	navCollapsedSize: number
@@ -20,6 +21,7 @@ interface ChatLayoutProps {
 
 
 const ChatLayout = ({
+	chats,
 	defaultLayout = [40, 60],
 	defaultCollapsed = false,
 	navCollapsedSize,
@@ -35,7 +37,7 @@ const ChatLayout = ({
 						sizes
 					)}`
 				}}
-				className="h-full max-h-[800px] items-stretch"
+				className="h-full items-stretch"
 			>
 				<ResizablePanel
 					defaultSize={defaultLayout[0]}
@@ -81,7 +83,7 @@ const ChatLayout = ({
 					defaultSize={defaultLayout[1]}
 					minSize={30}
 				>
-					<ChatInterface chats={[]} />
+					<ChatInterface chats={chats} />
 				</ResizablePanel>
 
 			</ResizablePanelGroup>
