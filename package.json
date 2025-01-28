@@ -1,5 +1,6 @@
 {
   "name": "resto-genie",
+  "homepage": "https://hariharanmh.github.io/resto-genie-ui/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +11,9 @@
     "preview": "vite preview",
     "prepare": "husky",
     "format-check": "prettier . --check",
-    "format-code": "prettier . --write"
+    "format-code": "prettier . --write",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.2",
@@ -22,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "gh-pages": "^6.3.0",
     "lucide-react": "^0.474.0",
     "react": "^18.3.1",
     "react-cookie": "^7.2.2",
