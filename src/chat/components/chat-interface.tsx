@@ -26,13 +26,13 @@ const ChatInterface = () => {
 		}
 	};
 
-	const handleSend = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const handleSend = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		if (!message) {
 			return;
 		}
 		setIsThinking(true);
-		postChat(message);
+		await postChat(message);
 		setMessage(""); // Clear input after processing
 		setIsThinking(false);
 	}
