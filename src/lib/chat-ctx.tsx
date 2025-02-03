@@ -7,7 +7,7 @@ interface ChatContent {
     location?: string | null;
     latitude?: string | null;
     longitude?: string | null;
-    recommended_restaurant_names?: string[] | [] | null;
+    recommended_restaurant_names: string[];
 }
 
 interface Chat {
@@ -32,7 +32,7 @@ const ChatContext = createContext<{
     postChat: (
         message: string
     ) => void;
-    recommendations: Recommendations[] | null;
+    recommendations: Recommendations[];
     getRecommendations: (
         names: string[]
     ) => void;
@@ -43,7 +43,7 @@ const ChatContext = createContext<{
     isLoading: false,
     getChat: () => null,
     postChat: () => null,
-    recommendations: null,
+    recommendations: [],
     getRecommendations: () => null,
     sysReady: false,
     sysReadyCheck: () => null,
@@ -152,9 +152,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             try {
                 setIsLoading(true);
 
-                const response = await client.post(`${apiPrefix}get-recommended-restaurants`, {
-                    restaurant_names: names
-                });
+                const response = await client.post(`${apiPrefix}get-recommended-restaurants`, names);
                 console.log(response);
                 
                 setRecommendations(response.data);
