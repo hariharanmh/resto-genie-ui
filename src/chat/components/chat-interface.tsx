@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 
 
 const ChatInterface = () => {
-	const { chats, isLoading, postChat } = useChatContext();
+	const { chats, postChat } = useChatContext();
 	const [message, setMessage] = useState("");
 	const [isThinking, setIsThinking] = useState(false);
 	const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -62,7 +62,7 @@ const ChatInterface = () => {
 		<div className="flex h-full flex-col">
 			<div className="flex items-center p-2">
 				<div className="flex items-center px-4 py-2">
-					<h1 className="text-xl font-bold">Let me help you find the best restaurants around. Just ask! 🍴</h1>
+					<h1 className="text-xl font-bold">Let me help you find the best restaurants around. Just ask!</h1>
 				</div>
 				{/* <div className="flex items-center gap-2">
 					Let me help you find the best restaurants around. Just ask! 🍴
