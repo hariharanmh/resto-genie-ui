@@ -7,6 +7,7 @@ interface ChatContent {
     location?: string | null;
     latitude?: string | null;
     longitude?: string | null;
+    recommended_restaurant_names?: string[] | [] | null;
 }
 
 interface Chat {
@@ -15,6 +16,14 @@ interface Chat {
     content: ChatContent;
 }
 
+interface Recommendations {
+    name?: string;
+    address?: string;
+    rating?: string | number;
+    user_rating_count?: string | number;
+    open_now?: boolean;
+    google_maps_uri?: string;
+}
 
 const ChatContext = createContext<{
     chats?: Chat[] | null;
@@ -23,6 +32,7 @@ const ChatContext = createContext<{
     postChat: (
         message: string
     ) => void;
+    recommendations: Recommendations[] | null;
     getRecommendations: (
         names: string[]
     ) => void;
@@ -33,6 +43,7 @@ const ChatContext = createContext<{
     isLoading: false,
     getChat: () => null,
     postChat: () => null,
+    recommendations: null,
     getRecommendations: () => null,
     sysReady: false,
     sysReadyCheck: () => null,
@@ -56,6 +67,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [sysReady, setSysReady] = useState(false);
+    const [recommendations, setRecommendations] = useState<Recommendations[]>([]);
 
     const baseUrl = "https://8000-idx-restogenie-1735936089471.cluster-7ubberrabzh4qqy2g4z7wgxuw2.cloudworkstations.dev/";
     const apiPrefix = "recommendation-engine/";
@@ -135,12 +147,17 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(false);
             }
         },
-        getRecommendations: async () => {
+        recommendations,
+        getRecommendations: async (names: string[]) => {
             try {
                 setIsLoading(true);
 
-                const response = await client.get(`${apiPrefix}recommendations`);
+                const response = await client.post(`${apiPrefix}get-recommended-restaurants`, {
+                    restaurant_names: names
+                });
                 console.log(response);
+                
+                setRecommendations(response.data);
             } catch (error: any) {
                 console.error(error);
             } finally {
