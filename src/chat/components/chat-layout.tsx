@@ -9,11 +9,10 @@ import { Search } from 'lucide-react';
 import { useState } from 'react';
 import RecommendationInterface from './recommendation-interface';
 import ChatInterface from './chat-interface';
-import { Chat } from '../data';
+import { useChatContext } from '@/lib/chat-ctx';
 
 
 interface ChatLayoutProps {
-	chats: Chat[]
 	defaultLayout: number[] | undefined
 	defaultCollapsed?: boolean
 	navCollapsedSize: number
@@ -21,13 +20,16 @@ interface ChatLayoutProps {
 
 
 const ChatLayout = ({
-	chats,
 	defaultLayout = [40, 60],
 	defaultCollapsed = false,
 	navCollapsedSize,
 }: ChatLayoutProps): JSX.Element => {
 
-	const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
+	const { sysReady, sysReadyCheck } = useChatContext();
+	const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
+
+	// sysReadyCheck();
+
 	return (
 		<TooltipProvider delayDuration={0}>
 			<ResizablePanelGroup
@@ -62,8 +64,13 @@ const ChatLayout = ({
 						"min-w-[50px] transition-all duration-300 ease-in-out"
 					)}
 				>
-					<div className="flex items-center px-4 py-2">
+					<div className="flex items-center px-4 py-2 gap-2">
 						<h1 className="text-xl font-bold">Recommendations</h1>
+						{
+							sysReady && (
+								<span className="flex h-2 w-2 rounded-full bg-green-600" />
+							)
+						}
 					</div>
 					<Separator />
 					<div className="bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -83,7 +90,7 @@ const ChatLayout = ({
 					defaultSize={defaultLayout[1]}
 					minSize={30}
 				>
-					<ChatInterface chats={chats} />
+					<ChatInterface />
 				</ResizablePanel>
 
 			</ResizablePanelGroup>

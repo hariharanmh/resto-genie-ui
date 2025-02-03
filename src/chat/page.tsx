@@ -1,7 +1,6 @@
 import ChatLayout from "./components/chat-layout";
 import { useCookies } from 'react-cookie';
 // import { cn } from "@/lib/utils";
-import { chats } from "./data";
 import { ChatContextProvider } from "@/lib/chat-ctx";
 
 
@@ -20,7 +19,6 @@ const ChatPage = () => {
 				{/* <div className="container w-[1000px] max-w-[95vw] mx-auto"> */}
 				{/* <section className={cn("overflow-hidden rounded-[0.5rem] border bg-background shadow")}> */}
 				<ChatLayout
-					chats={chats}
 					defaultLayout={defaultLayout}
 					defaultCollapsed={defaultCollapsed}
 					navCollapsedSize={4}
