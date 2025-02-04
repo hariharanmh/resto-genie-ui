@@ -159,9 +159,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 if (use_local_cache) {
                     requiredRecommendations = names.filter((name) => !existingRecommendations.has(name));
                 }
+                console.log('existingRecommendations -> ', existingRecommendations);
+                console.log('requiredRecommendations -> ', requiredRecommendations);
 
                 // Avoid API if no details required
-                if (requiredRecommendations) return;
+                if (!requiredRecommendations) return;
 
                 const response = await client.post(`${apiPrefix}get-recommended-restaurants`, requiredRecommendations);
                 console.log(response);
