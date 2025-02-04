@@ -15,8 +15,8 @@ const RecommendationInterface = () => {
 			chats[chats.length - 1]?.content.recommended_restaurant_names &&
 			chats[chats.length - 1]?.content.recommended_restaurant_names.length > 0
 		) {
-			// TODO: Add cache to reduce multiple unwanted calls
-			getRecommendations(chats[chats.length - 1].content.recommended_restaurant_names as string[]);
+			const recommendedRestaurantNames = chats[chats.length - 1].content.recommended_restaurant_names as string[]
+			getRecommendations(recommendedRestaurantNames, true);
 		}
 	}, [chats]);
 

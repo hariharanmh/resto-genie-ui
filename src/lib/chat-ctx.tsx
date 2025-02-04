@@ -17,7 +17,7 @@ interface Chat {
 }
 
 interface Recommendations {
-    name?: string;
+    name: string;
     address?: string;
     rating?: string | number;
     user_rating_count?: string | number;
@@ -30,11 +30,12 @@ const ChatContext = createContext<{
     isLoading: boolean;
     getChat: () => void;
     postChat: (
-        message: string
+        message: string,
     ) => void;
     recommendations: Recommendations[];
     getRecommendations: (
-        names: string[]
+        names: string[],
+        use_local_cache: boolean,
     ) => void;
     sysReady: boolean;
     sysReadyCheck: () => void;
@@ -100,25 +101,25 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                 });
-    
+
                 if (!response.body) {
                     throw new Error("ReadableStream not supported in this browser.");
                 }
-    
+
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let accumulatedText = "";
                 let seenMessages = new Set(); // To store unique content messages
-    
+
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
-    
+
                     accumulatedText += decoder.decode(value, { stream: true });
-    
+
                     const lines = accumulatedText.split("\n");
                     accumulatedText = lines.pop() || ""; // Save incomplete part
-    
+
                     const newChats = lines
                         .map(line => line.trim()) // Remove any extra spaces
                         .filter(line => line.length > 0) // Ignore empty lines
@@ -126,7 +127,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                             try {
                                 const jsonData = JSON.parse(line);
                                 const contentString = JSON.stringify(jsonData.content); // Extract `content` field
-    
+
                                 if (!seenMessages.has(contentString)) {
                                     seenMessages.add(contentString); // Track unique messages
                                     return jsonData;
@@ -138,7 +139,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                             }
                         })
                         .filter(Boolean); // Remove null values
-    
+
                     setChats(prevChats => [...prevChats, ...newChats]);
                 }
             } catch (error) {
@@ -148,14 +149,29 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             }
         },
         recommendations,
-        getRecommendations: async (names: string[]) => {
+        getRecommendations: async (names: string[], use_local_cache: boolean = false) => {
             try {
                 setIsLoading(true);
 
-                const response = await client.post(`${apiPrefix}get-recommended-restaurants`, names);
+                let requiredRecommendations: string[] = names;
+                const existingRecommendations: Map<string, Recommendations> = new Map(recommendations.map(rec => [rec.name, rec]));
+
+                if (use_local_cache) {
+                    requiredRecommendations = names.filter((name) => !existingRecommendations.has(name));
+                }
+
+                // Avoid API if no details required
+                if (requiredRecommendations) return;
+
+                const response = await client.post(`${apiPrefix}get-recommended-restaurants`, requiredRecommendations);
                 console.log(response);
-                
-                setRecommendations(response.data);
+                const fetchedRecommendations: Map<string, Recommendations> = new Map(response.data.map((rec: Recommendations) => [rec.name, rec]))
+                const newRecommendations: (Recommendations | undefined)[] = names.map((name) => {
+                    return existingRecommendations.has(name) ? existingRecommendations.get(name) : fetchedRecommendations.get(name);
+                });
+                if (newRecommendations && newRecommendations.length > 0) {
+                    setRecommendations(newRecommendations as Recommendations[]);
+                }
             } catch (error: any) {
                 console.error(error);
             } finally {
