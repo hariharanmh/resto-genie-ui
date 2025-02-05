@@ -1,11 +1,26 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useChatContext } from "@/lib/chat-ctx";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
+import { Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 
 const RecommendationInterface = () => {
 	const { chats, recommendations, getRecommendations } = useChatContext();
+	const [searchQuery, setSearchQuery] = useState("");
+	const chatEndRef = useRef<HTMLDivElement | null>(null);
+	const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+	const filteredRecommendations = recommendations?.filter((recommendation) =>
+		recommendation?.name.toLowerCase().includes(searchQuery.toLowerCase())
+	);
+
+	useEffect(() => {
+		if (chatContainerRef.current) {
+			chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+		}
+	}, [chats]);
 
 	useEffect(() => {
 		console.log('chats updated-> ', chats);
@@ -30,52 +45,66 @@ const RecommendationInterface = () => {
 	};
 
 	return (
-		<ScrollArea className="h-screen">
-			{
-				recommendations && recommendations.map((recommendation, idx) => (
-					<div className="flex flex-col gap-2 p-4 pt-0" key={idx}>
-						<button className={cn(
-							"flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-							false && "bg-muted"
-						)} onClick={handleOnClick(recommendation.google_maps_uri as string)}
-						>
-							<div className="flex w-full flex-col gap-1">
-								<div className="flex items-center">
-									<div className="flex items-center gap-2">
-										<div className="font-semibold">{recommendation.name}</div>
-										{
-											recommendation.open_now ? (
-												<span className="flex h-2 w-2 rounded-full bg-green-600" />
-											) : (
-												<span className="flex h-2 w-2 rounded-full bg-red-600" />
-											)
-										}
-										{/* <div
-							className={cn(
-								"ml-auto text-xs",
-								mail.selected === item.id
-									? "text-foreground"
-									: "text-muted-foreground"
-							)}
-						>
-							{formatDistanceToNow(new Date(), {
-								addSuffix: true,
-							})}
-						</div> */}
-									</div>
-								</div>
-								<div className="text-xs font-medium">{recommendation.rating}&nbsp;({recommendation.user_rating_count})</div>
-								<div className="line-clamp-2 text-xs text-muted-foreground">
-									{recommendation.address?.substring(0, 300)}
-								</div>
-
-							</div>
-						</button>
+		<div className="flex h-full flex-col items-center justify-center p-4 bg-gray-100 dark:bg-gray-900">
+			<Card className="flex flex-col h-[90vh] w-full max-w-2xl shadow-xl rounded-2xl bg-white dark:bg-gray-800">
+				{/* Header */}
+				<CardHeader className="sticky top-0 z-10 flex flex-row items-center shrink-0 p-6 bg-white dark:bg-gray-800 border-b shadow-md">
+					<div className="flex items-center space-x-4 w-full">
+						<div>
+							<p className="text-lg font-semibold text-gray-900 dark:text-white">Top Restaurant Picks</p>
+						</div>
 					</div>
-				))
-			}
-		</ScrollArea>
-	)
+				</CardHeader>
+
+				{/* Chat Area */}
+				<CardContent ref={chatContainerRef} className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+					<div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+						<form>
+							<div className="relative">
+								<Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+								<Input
+									placeholder="Search restaurants..."
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									className="pl-8"
+								/>
+							</div>
+						</form>
+					</div>
+					{filteredRecommendations?.length > 0 ? (
+						filteredRecommendations.map((recommendation, idx) => (
+							<div key={idx} className="flex flex-col gap-2 p-4 border rounded-lg shadow-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+								<button
+									className="text-left w-full"
+									onClick={handleOnClick(recommendation?.google_maps_uri as string)}
+								>
+									<div className="flex items-center justify-between">
+										<span className="font-semibold text-gray-900 dark:text-white">{recommendation.name}</span>
+										<span className={cn(
+											"h-2 w-2 rounded-full",
+											recommendation.open_now ? "bg-green-500" : "bg-red-400"
+										)} />
+									</div>
+									<div className="text-sm text-gray-600 dark:text-gray-400">⭐ {recommendation.rating} ({recommendation.user_rating_count} reviews)</div>
+									<div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+										{recommendation.address}
+									</div>
+								</button>
+							</div>
+						))
+					) : (
+						<p className="text-center text-gray-500 dark:text-gray-400 py-4">No recommendations found.</p>
+					)}
+					<div ref={chatEndRef} />
+				</CardContent>
+
+				{/* Footer */}
+				<CardFooter className="sticky bottom-0 z-10 shrink-0 p-4 bg-white dark:bg-gray-800 border-t shadow-md">
+
+				</CardFooter>
+			</Card>
+		</div>
+	);
 }
 
 export default RecommendationInterface;
