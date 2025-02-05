@@ -1,19 +1,20 @@
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-// import { Label } from "@/components/ui/label";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useChatContext } from "@/lib/chat-ctx";
-import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 
 const ChatInterface = () => {
 	const { chats, postChat } = useChatContext();
 	const [message, setMessage] = useState("");
 	const [isThinking, setIsThinking] = useState(false);
-	const scrollRef = useRef<HTMLDivElement | null>(null);
+	const chatEndRef = useRef<HTMLDivElement | null>(null);
+	const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setMessage(e.target.value);
@@ -38,109 +39,78 @@ const ChatInterface = () => {
 	}
 
 	useEffect(() => {
-		if (!scrollRef.current) {
-			console.error("scrollRef is null, skipping scroll.");
-			return; // Exit early if ref is not set
+		if (chatContainerRef.current) {
+			chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
 		}
-
-		setTimeout(() => { // Ensure DOM updates before scrolling
-			const scrollableElement = scrollRef.current?.querySelector(".scroll-area-content") as HTMLElement | null;
-
-			if (scrollableElement) {
-				// console.log(scrollableElement);
-				console.log('bf -> ', scrollableElement.scrollTop, scrollableElement.scrollHeight, scrollableElement.clientHeight);
-				scrollableElement.scrollTop = scrollableElement.scrollHeight - scrollableElement.clientHeight;
-				console.log('af -> ', scrollableElement.scrollTop);
-			} else {
-				console.error("Scrollable element not found within scrollRef.");
-			}
-		}, 0);
-	}, [chats]); // Runs when 'allChats' updates
+	}, [chats]);
 
 
 	return (
-		<div className="flex h-full flex-col">
-			<div className="flex items-center p-2">
-				<div className="flex items-center px-4 py-2">
-					<h1 className="text-xl font-bold">Let me help you find the best restaurants around. Just ask!</h1>
-				</div>
-				{/* <div className="flex items-center gap-2">
-					Let me help you find the best restaurants around. Just ask! 🍴
-				</div> */}
-			</div>
-			<Separator />
-
-			<ScrollArea ref={scrollRef} className="h-screen w-full" >
-				<div className="scroll-area-content">
-					{chats && chats.map((_chat, idx) => (
-						<div className="flex flex-1 flex-col" key={idx}>
-							<div className="flex items-start p-4">
-								<div className="flex items-start gap-4 text-sm">
-									{/* <Avatar>
-								<AvatarImage alt={_chat.role} />
-								<AvatarFallback>
-									{_chat.role == "model" ? "M" : "U"}
-								</AvatarFallback>
-							</Avatar> */}
-									<div className="grid gap-1">
-										<div className="font-semibold">{_chat.role == "model" ? "AI Response:" : "You asked:"}</div>
-										{/* <div className="line-clamp-1 text-xs">{"mail.subject"}</div>
-								<div className="line-clamp-1 text-xs">
-									<span className="font-medium">Reply-To:</span> {"mail.email"}
-								</div> */}
-									</div>
-								</div>
-								{_chat.timestamp && (
-									<div className="ml-auto text-xs text-muted-foreground">
-										{format(new Date(_chat.timestamp), "PPpp")}
-									</div>
-								)}
-							</div>
-							{/* <Separator className="mx-4" /> */}
-							<div className="flex-1 whitespace-pre-wrap p-4 text-sm">
-								{_chat.content && _chat.content.message}
-							</div>
-							<Separator />
-						</div>
-					))}
-				</div>
-				<ScrollBar orientation="vertical" />
-
-			</ScrollArea>
-
-
-			<Separator className="mt-auto" />
-			<div className="p-4">
-				{
-					isThinking &&
-					<div className="flex-1 whitespace-pre-wrap p-4 text-sm">Thinking...</div>
-				}
-				<form>
-					<div className="grid gap-4">
-						<Textarea
-							className="p-4"
-							placeholder={`Reply ${"name"}...`}
-							value={message}
-							onChange={handleInputChange}
-							onKeyDown={handleKeyDown}
-							disabled={isThinking}
-						/>
-						<div className="flex items-center">
-							<Button
-								onClick={handleSend}
-								size="sm"
-								className="ml-auto"
-								type="button"
-								disabled={isThinking}
-							>
-								Send
-							</Button>
+		<div className="flex h-full flex-col items-center justify-center p-4 bg-gray-100 dark:bg-gray-900">
+			<Card className="flex flex-col h-[90vh] w-full max-w-2xl shadow-xl rounded-2xl bg-white dark:bg-gray-800">
+				{/* Header */}
+				<CardHeader className="sticky top-0 z-10 flex flex-row items-center shrink-0 p-6 bg-white dark:bg-gray-800 border-b shadow-md">
+					<div className="flex items-center space-x-4 w-full">
+						<div>
+							<p className="text-lg font-semibold text-gray-900 dark:text-white">RestoGenie</p>
+							<p className="text-sm text-gray-500 dark:text-gray-400">Your AI-powered restaurant guide</p>
 						</div>
 					</div>
-				</form>
-			</div>
+				</CardHeader>
+
+				{/* Chat Area */}
+				<CardContent ref={chatContainerRef} className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+					{chats?.map((chat, index) => (
+						<motion.div
+							key={index}
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3 }}
+							className={cn(
+								"flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-4 py-2 text-sm shadow-md",
+								chat.role === "user"
+									? "ml-auto bg-blue-500 text-white"
+									: "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
+							)}
+						>
+							{chat.content?.message}
+						</motion.div>
+					))}
+					<div ref={chatEndRef} />
+				</CardContent>
+
+				{/* Footer */}
+				<CardFooter className="sticky bottom-0 z-10 shrink-0 p-4 bg-white dark:bg-gray-800 border-t shadow-md">
+					<form className="flex w-full items-center space-x-2">
+						<div className="w-full grid gap-4">
+							{isThinking && (
+								<div className="text-sm text-gray-500 dark:text-gray-400">Thinking...</div>
+							)}
+							<Textarea
+								className="p-4 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500"
+								placeholder="Ask RestoGenie for restaurant recommendations..."
+								value={message}
+								onChange={handleInputChange}
+								onKeyDown={handleKeyDown}
+								disabled={isThinking}
+							/>
+							<div className="flex items-center">
+								<Button
+									onClick={handleSend}
+									size="sm"
+									className="ml-auto transition-transform transform hover:scale-105 hover:bg-blue-600"
+									type="button"
+									disabled={isThinking}
+								>
+									<Send className="w-5 h-5" />
+								</Button>
+							</div>
+						</div>
+					</form>
+				</CardFooter>
+			</Card>
 		</div>
-	)
+	);
 }
 
 export default ChatInterface;
