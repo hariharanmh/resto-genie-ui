@@ -84,8 +84,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(true);
 
                 const response = await client.get(`${apiPrefix}chat`);
-                console.log(response);
-
+                
                 setChats(response.data);
             } catch (error: any) {
                 console.error(error);
@@ -159,14 +158,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 if (use_local_cache) {
                     requiredRecommendations = names.filter((name) => !existingRecommendations.has(name));
                 }
-                console.log('existingRecommendations -> ', existingRecommendations);
-                console.log('requiredRecommendations -> ', requiredRecommendations);
-
+                
                 // Avoid API if no details required
                 if (!requiredRecommendations) return;
 
                 const response = await client.post(`${apiPrefix}get-recommended-restaurants`, requiredRecommendations);
-                console.log(response);
                 const fetchedRecommendations: Map<string, Recommendations> = new Map(response.data.map((rec: Recommendations) => [rec.name, rec]))
                 const newRecommendations: (Recommendations | undefined)[] = names.map((name) => {
                     return existingRecommendations.has(name) ? existingRecommendations.get(name) : fetchedRecommendations.get(name);
@@ -183,8 +179,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         sysReady,
         sysReadyCheck: async () => {
             try {
-                const response = await client.get(`system-check`);
-                console.log('sys check -> ', response)
+                await client.get(`system-check`);
                 setSysReady(true);
             } catch (error: any) {
                 console.error(error);
