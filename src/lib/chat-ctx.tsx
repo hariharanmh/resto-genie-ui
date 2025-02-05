@@ -84,7 +84,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(true);
 
                 const response = await client.get(`${apiPrefix}chat`);
-                
+
                 setChats(response.data);
             } catch (error: any) {
                 console.error(error);
@@ -153,22 +153,32 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(true);
 
                 let requiredRecommendations: string[] = names;
-                const existingRecommendations: Map<string, Recommendations> = new Map(recommendations.map(rec => [rec.name, rec]));
+                const existingRecommendations: Map<string, Recommendations> = new Map(
+                    (recommendations ?? []).filter(rec => rec).map(rec => [rec.name, rec])
+                );
+
 
                 if (use_local_cache) {
                     requiredRecommendations = names.filter((name) => !existingRecommendations.has(name));
                 }
-                
+
                 // Avoid API if no details required
                 if (!requiredRecommendations) return;
 
                 const response = await client.post(`${apiPrefix}get-recommended-restaurants`, requiredRecommendations);
-                const fetchedRecommendations: Map<string, Recommendations> = new Map(response.data.map((rec: Recommendations) => [rec.name, rec]))
-                const newRecommendations: (Recommendations | undefined)[] = names.map((name) => {
-                    return existingRecommendations.has(name) ? existingRecommendations.get(name) : fetchedRecommendations.get(name);
-                });
-                if (newRecommendations && newRecommendations.length > 0) {
-                    setRecommendations(newRecommendations as Recommendations[]);
+                const fetchedRecommendationsArray = response.data ?? [];
+                
+                const fetchedRecommendations: Map<string, Recommendations> = new Map(
+                    fetchedRecommendationsArray
+                        .filter((rec: Recommendations) => rec?.name) 
+                        .map((rec: Recommendations) => [rec.name, rec])
+                );
+                const newRecommendations: Recommendations[] = names.map((name) => 
+                    existingRecommendations.get(name) ?? fetchedRecommendations.get(name)
+                ).filter((rec): rec is Recommendations => rec !== undefined);
+                
+                if (newRecommendations.length > 0) {
+                    setRecommendations(newRecommendations);
                 }
             } catch (error: any) {
                 console.error(error);
