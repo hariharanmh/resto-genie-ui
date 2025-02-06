@@ -8,8 +8,7 @@ const ChatPage = () => {
 	const [cookies] = useCookies(['react-resizable-panels:layout:chat', 'react-resizable-panels:collapsed']);
 	const layout = cookies["react-resizable-panels:layout:chat"]
 	const collapsed = cookies["react-resizable-panels:collapsed"]
-	// console.log(layout, collapsed)
-
+	
 	const defaultLayout = layout
 	const defaultCollapsed = collapsed
 
@@ -21,7 +20,7 @@ const ChatPage = () => {
 				<ChatLayout
 					defaultLayout={defaultLayout}
 					defaultCollapsed={defaultCollapsed}
-					navCollapsedSize={4}
+					navCollapsedSize={30}
 				/>
 				{/* </section> */}
 				{/* </div> */}

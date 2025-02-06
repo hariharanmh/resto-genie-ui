@@ -58,7 +58,7 @@ const ChatLayout = ({
 					<RecommendationInterface />
 				</ResizablePanel>
 
-				<ResizableHandle withHandle />
+				<ResizableHandle />
 
 				<ResizablePanel
 					defaultSize={defaultLayout[1]}
