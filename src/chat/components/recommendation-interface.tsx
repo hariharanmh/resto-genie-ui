@@ -73,20 +73,22 @@ const RecommendationInterface = () => {
 					</div>
 					{filteredRecommendations?.length > 0 ? (
 						filteredRecommendations.map((recommendation, idx) => (
-							<div key={idx} className="flex flex-col gap-2 p-4 border rounded-lg shadow-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all">
+							<div key={idx} className="flex flex-col gap-2 p-2 pt-0">
 								<button
-									className="text-left w-full"
+									className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
 									onClick={handleOnClick(recommendation?.google_maps_uri as string)}
 								>
-									<div className="flex items-center justify-between">
-										<span className="font-semibold text-gray-900 dark:text-white">{recommendation.name}</span>
-										<span className={cn(
-											"h-2 w-2 rounded-full",
-											recommendation.open_now ? "bg-green-500" : "bg-red-400"
-										)} />
+									<div className="flex w-full flex-col gap-1">
+										<div className="flex items-center justify-between">
+											<span className="font-semibold text-gray-900 dark:text-white">{recommendation.name}</span>
+											<span className={cn(
+												"flex h-2 w-2 rounded-full",
+												recommendation.open_now ? "bg-green-500" : "bg-red-400"
+											)} />
+										</div>
+										<div className="text-xs font-medium">⭐ {recommendation.rating} ({recommendation.user_rating_count} reviews)</div>
 									</div>
-									<div className="text-sm text-gray-600 dark:text-gray-400">⭐ {recommendation.rating} ({recommendation.user_rating_count} reviews)</div>
-									<div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+									<div className="text-xs text-muted-foreground line-clamp-2">
 										{recommendation.address}
 									</div>
 								</button>

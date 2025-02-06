@@ -47,7 +47,7 @@ const ChatInterface = () => {
 
 	return (
 		<div className="flex h-full flex-col items-center justify-center p-4 bg-gray-100 dark:bg-gray-900">
-			<Card className="flex flex-col h-[90vh] w-full max-w-2xl shadow-xl rounded-2xl bg-white dark:bg-gray-800">
+			<Card className="flex flex-col h-[90vh] w-full max-w-4xl shadow-xl rounded-2xl bg-white dark:bg-gray-800">
 				{/* Header */}
 				<CardHeader className="sticky top-0 z-10 flex flex-row items-center shrink-0 p-6 bg-white dark:bg-gray-800 border-b shadow-md">
 					<div className="flex items-center space-x-4 w-full">
