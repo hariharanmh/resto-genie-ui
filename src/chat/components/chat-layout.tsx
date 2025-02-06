@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import RecommendationInterface from './recommendation-interface';
 import ChatInterface from './chat-interface';
+import { motion } from 'framer-motion';
 
 
 interface ChatLayoutProps {
@@ -30,7 +31,8 @@ const ChatLayout = ({
 						sizes
 					)}`
 				}}
-				className="h-full items-stretch"
+				className="bg-white dark:bg-gray-900 bg-opacity-50 shadow-lg backdrop-blur-md rounded-lg p-4 
+			flex flex-col md:flex-row h-full w-full"
 			>
 				<ResizablePanel
 					defaultSize={defaultLayout[0]}
@@ -55,7 +57,15 @@ const ChatLayout = ({
 						"min-w-[50px] transition-all duration-300 ease-in-out"
 					)}
 				>
-					<RecommendationInterface />
+					<motion.div
+						initial={{ opacity: 0, y: -20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -20 }}
+						transition={{ type: "spring", stiffness: 100, damping: 10 }}
+						className="h-full flex flex-col"
+					>
+						<RecommendationInterface />
+					</motion.div>
 				</ResizablePanel>
 
 				<ResizableHandle />
@@ -64,12 +74,20 @@ const ChatLayout = ({
 					defaultSize={defaultLayout[1]}
 					minSize={30}
 				>
-					<ChatInterface />
+					<motion.div
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: 10 }}
+						transition={{ duration: 0.3, ease: "easeInOut" }}
+						className="h-full flex flex-col"
+					>
+						<ChatInterface />
+					</motion.div>
 				</ResizablePanel>
-
 			</ResizablePanelGroup>
 		</TooltipProvider>
-	)
+
+	);
 }
 
 export default ChatLayout;
