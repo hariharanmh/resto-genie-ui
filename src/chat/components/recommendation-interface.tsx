@@ -3,27 +3,18 @@ import { Input } from "@/components/ui/input";
 import { useChatContext } from "@/lib/chat-ctx";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 
 const RecommendationInterface = () => {
 	const { chats, recommendations, getRecommendations } = useChatContext();
 	const [searchQuery, setSearchQuery] = useState("");
-	const chatEndRef = useRef<HTMLDivElement | null>(null);
-	const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
 	const filteredRecommendations = recommendations?.filter((recommendation) =>
 		recommendation?.name.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
 	useEffect(() => {
-		if (chatContainerRef.current) {
-			chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-		}
-	}, [chats]);
-
-	useEffect(() => {
-		console.log('chats updated-> ', chats);
 		// call to collect recommended restaurant details
 		if (
 			chats &&
@@ -56,8 +47,8 @@ const RecommendationInterface = () => {
 					</div>
 				</CardHeader>
 
-				{/* Chat Area */}
-				<CardContent ref={chatContainerRef} className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+				{/* Recommendation Area */}
+				<CardContent className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
 					<div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 						<form>
 							<div className="relative">
@@ -95,9 +86,10 @@ const RecommendationInterface = () => {
 							</div>
 						))
 					) : (
-						<p className="text-center text-gray-500 dark:text-gray-400 py-4">No recommendations found.</p>
+						<div className="flex flex-col h-full items-center justify-center gap-2 text-gray-500">
+							<p>No recommendations available. Ask RestoGenie for restaurants!</p>
+						</div>
 					)}
-					<div ref={chatEndRef} />
 				</CardContent>
 
 				{/* Footer */}
