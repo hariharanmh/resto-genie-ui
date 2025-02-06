@@ -9,12 +9,20 @@ import { motion } from "framer-motion";
 
 
 const ChatInterface = () => {
-	const { chats, postChat } = useChatContext();
+	const { chats, getChat, postChat } = useChatContext();
 	const [message, setMessage] = useState("");
 	const [isThinking, setIsThinking] = useState(false);
+	const initialized = useRef(false)
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 	const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
+
+	useEffect(() => {
+		if (!initialized.current) {
+			initialized.current = true;
+			getChat();
+		}
+	}, []);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setMessage(e.target.value);

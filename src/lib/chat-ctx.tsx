@@ -84,8 +84,24 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(true);
 
                 const response = await client.get(`${apiPrefix}chat`);
+                const data = response.data as string
+                const lines = data.split("\n");
 
-                setChats(response.data);
+                const newChats = lines
+                    .map(line => line.trim()) // Remove any extra spaces
+                    .filter(line => line.length > 0) // Ignore empty lines
+                    .map(line => {
+                        try {
+                            const jsonData = JSON.parse(line);
+                            return jsonData; // Ignore duplicate messages
+                        } catch (e) {
+                            console.error("Error parsing JSON:", e, line);
+                            return null;
+                        }
+                    })
+                    .filter(Boolean); // Remove null values
+                // console.log(newChats)
+                setChats(newChats);
             } catch (error: any) {
                 console.error(error);
             } finally {
@@ -165,18 +181,18 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 // Avoid API if no details required
                 if (!requiredRecommendations) return;
 
-                const response = await client.post(`${apiPrefix}get-recommended-restaurants`, requiredRecommendations);
+                const response = await client.post(`${apiPrefix}get-recommended-restaurants/`, requiredRecommendations);
                 const fetchedRecommendationsArray = response.data ?? [];
-                
+
                 const fetchedRecommendations: Map<string, Recommendations> = new Map(
                     fetchedRecommendationsArray
-                        .filter((rec: Recommendations) => rec?.name) 
+                        .filter((rec: Recommendations) => rec?.name)
                         .map((rec: Recommendations) => [rec.name, rec])
                 );
-                const newRecommendations: Recommendations[] = names.map((name) => 
+                const newRecommendations: Recommendations[] = names.map((name) =>
                     existingRecommendations.get(name) ?? fetchedRecommendations.get(name)
                 ).filter((rec): rec is Recommendations => rec !== undefined);
-                
+
                 if (newRecommendations.length > 0) {
                     setRecommendations(newRecommendations);
                 }
