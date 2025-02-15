@@ -68,7 +68,7 @@ const ChatInterface = () => {
 
 				{/* Chat Area */}
 				<CardContent ref={chatContainerRef} className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-					{chats?.map((chat, index) => (
+					{chats && chats.map((chat, index) => (
 						<motion.div
 							key={index}
 							initial={{ opacity: 0, y: 10 }}
