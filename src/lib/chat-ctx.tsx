@@ -75,6 +75,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const client = axios.create({
         baseURL: baseUrl
     });
+    client.defaults.withCredentials = true;
 
     const contextValue = {
         chats,
@@ -114,7 +115,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
 
                 const response = await fetch(`${baseUrl}${apiPrefix}chat?prompt=${message}`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    credentials: 'include',
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "WithCredentials": "true",
+                    },
                 });
 
                 if (!response.body) {
