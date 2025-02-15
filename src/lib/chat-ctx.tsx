@@ -85,23 +85,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(true);
 
                 const response = await client.get(`${apiPrefix}chat`);
-                const data = response.data as string
-                const lines = data.split("\n");
-
-                const newChats = lines
-                    .map(line => line.trim()) // Remove any extra spaces
-                    .filter(line => line.length > 0) // Ignore empty lines
-                    .map(line => {
-                        try {
-                            const jsonData = JSON.parse(line);
-                            return jsonData; // Ignore duplicate messages
-                        } catch (e) {
-                            console.error("Error parsing JSON:", e, line);
-                            return null;
-                        }
-                    })
-                    .filter(Boolean); // Remove null values
-                // console.log(newChats)
+                const newChats = response.data;
                 setChats(newChats);
             } catch (error: any) {
                 console.error(error);
