@@ -113,7 +113,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let accumulatedText = "";
-                let seenMessages = new Set(); // To store unique content messages
+                let latestMessages = new Map(); // Track the last message for each role
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -124,18 +124,16 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     const lines = accumulatedText.split("\n");
                     accumulatedText = lines.pop() || ""; // Save incomplete part
 
-                    const newChats = lines
+                    lines
                         .map(line => line.trim()) // Remove any extra spaces
                         .filter(line => line.length > 0) // Ignore empty lines
                         .map(line => {
                             try {
                                 const jsonData = JSON.parse(line);
-                                const contentString = JSON.stringify(jsonData.content); // Extract `content` field
+                                const role = jsonData.role;
 
-                                if (!seenMessages.has(contentString)) {
-                                    seenMessages.add(contentString); // Track unique messages
-                                    return jsonData;
-                                }
+                                // Update latest message for each role
+                                latestMessages.set(role, jsonData);
                                 return null; // Ignore duplicate messages
                             } catch (e) {
                                 console.error("Error parsing JSON:", e, line);
@@ -144,7 +142,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                         })
                         .filter(Boolean); // Remove null values
 
-                    setChats(prevChats => [...prevChats, ...newChats]);
+                    // Keep only the latest messages from each role
+                    setChats(prevChats => {
+                        const updatedChats = [...prevChats, ...Array.from(latestMessages.values())];
+                        return updatedChats;
+                    });
                 }
             } catch (error) {
                 console.error("Error posting chat", error);
