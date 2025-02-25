@@ -1,10 +1,11 @@
 import ChatPage from '@/chat/page';
+import { ThemeProvider } from './components/theme-provider';
 
 const App = () => {
   return (
-    <div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <ChatPage />
-    </div>
+    </ThemeProvider>
   )
 }
 

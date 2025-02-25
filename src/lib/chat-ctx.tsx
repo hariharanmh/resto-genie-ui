@@ -115,39 +115,41 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 let accumulatedText = "";
                 let latestMessages = new Map(); // Track the last message for each role
 
+                setChats(prevChats => {
+                    let updatedChats = [...prevChats]; // Keep existing chats before entering the loop
+
+                    const processChunk = async () => {
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
 
                     accumulatedText += decoder.decode(value, { stream: true });
-
                     const lines = accumulatedText.split("\n");
                     accumulatedText = lines.pop() || ""; // Save incomplete part
 
-                    lines
-                        .map(line => line.trim()) // Remove any extra spaces
-                        .filter(line => line.length > 0) // Ignore empty lines
-                        .map(line => {
+                            lines.forEach(line => {
                             try {
-                                const jsonData = JSON.parse(line);
-                                const role = jsonData.role;
-
-                                // Update latest message for each role
-                                latestMessages.set(role, jsonData);
-                                return null; // Ignore duplicate messages
+                                    const jsonData = JSON.parse(line.trim());
+                                    latestMessages.set(jsonData.role, jsonData); // Store latest message for each role
                             } catch (e) {
                                 console.error("Error parsing JSON:", e, line);
-                                return null;
-                            }
-                        })
-                        .filter(Boolean); // Remove null values
+                                }
+                            });
 
-                    // Keep only the latest messages from each role
-                    setChats(prevChats => {
-                        const updatedChats = [...prevChats, ...Array.from(latestMessages.values())];
-                        return updatedChats;
+                            // Merge prevChats and latestMessages
+                            updatedChats = [
+                                ...updatedChats.filter(chat => !latestMessages.has(chat.role)), // Keep old chats except replaced ones
+                                ...Array.from(latestMessages.values()), // Append latest messages
+                            ];
+
+                            setChats(updatedChats); // Update chats in real-time
+                        }
+                    };
+
+                    processChunk(); // Start processing stream
+
+                    return updatedChats; // Ensures existing chats persist
                     });
-                }
             } catch (error) {
                 console.error("Error posting chat", error);
             } finally {
