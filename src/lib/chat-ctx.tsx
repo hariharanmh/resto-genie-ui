@@ -4,10 +4,6 @@ import { useContext, createContext, type PropsWithChildren, useState } from "rea
 
 interface ChatContent {
     message: string;
-    location?: string | null;
-    latitude?: string | null;
-    longitude?: string | null;
-    recommended_restaurant_names: string[];
 }
 
 interface Chat {
