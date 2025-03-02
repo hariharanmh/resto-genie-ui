@@ -21,6 +21,16 @@ interface Restaurants {
     google_maps_uri?: string;
 }
 
+interface Recommendations {
+    name: string;
+    reason?: string;
+    specialties?: string[] | null;
+    match_score?: string | number;
+    dietary_options?: string[] | null;
+    ambiance?: string[] | null;
+    message?: string;
+}
+
 const ChatContext = createContext<{
     chats?: Chat[] | null;
     isLoading: boolean;
@@ -31,10 +41,7 @@ const ChatContext = createContext<{
     restaurants: Restaurants[];
     getAllRestaurants: () => void;
     recommendations: Recommendations[];
-    getRecommendations: (
-        names: string[],
-        use_local_cache: boolean,
-    ) => void;
+    getRecommendations: () => void;
     sysReady: boolean;
     sysReadyCheck: () => void;
 }>({
@@ -172,38 +179,13 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             }
         },
         recommendations,
-        getRecommendations: async (names: string[], use_local_cache: boolean = false) => {
+        getRecommendations: async () => {
             try {
                 setIsLoading(true);
 
-                let requiredRecommendations: string[] = names;
-                const existingRecommendations: Map<string, Recommendations> = new Map(
-                    (recommendations ?? []).filter(rec => rec).map(rec => [rec.name, rec])
-                );
-
-
-                if (use_local_cache) {
-                    requiredRecommendations = names.filter((name) => !existingRecommendations.has(name));
-                }
-
-                // Avoid API if no details required
-                if (!requiredRecommendations) return;
-
-                const response = await client.post(`${apiPrefix}get-recommended-restaurants/`, requiredRecommendations);
-                const fetchedRecommendationsArray = response.data ?? [];
-
-                const fetchedRecommendations: Map<string, Recommendations> = new Map(
-                    fetchedRecommendationsArray
-                        .filter((rec: Recommendations) => rec?.name)
-                        .map((rec: Recommendations) => [rec.name, rec])
-                );
-                const newRecommendations: Recommendations[] = names.map((name) =>
-                    existingRecommendations.get(name) ?? fetchedRecommendations.get(name)
-                ).filter((rec): rec is Recommendations => rec !== undefined);
-
-                if (newRecommendations.length > 0) {
+                const response = await client.post(`${apiPrefix}get-recommendations/`);
+                const newRecommendations = response.data;
                     setRecommendations(newRecommendations);
-                }
             } catch (error: any) {
                 console.error(error);
             } finally {
