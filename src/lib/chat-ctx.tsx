@@ -12,12 +12,12 @@ interface Chat {
     content: ChatContent;
 }
 
-interface Recommendations {
+interface Restaurants {
     name: string;
     address?: string;
     rating?: string | number;
-    user_rating_count?: string | number;
-    open_now?: boolean;
+    total_ratings?: string | number;
+    is_open?: boolean;
     google_maps_uri?: string;
 }
 
@@ -28,6 +28,8 @@ const ChatContext = createContext<{
     postChat: (
         message: string,
     ) => void;
+    restaurants: Restaurants[];
+    getAllRestaurants: () => void;
     recommendations: Recommendations[];
     getRecommendations: (
         names: string[],
@@ -40,6 +42,8 @@ const ChatContext = createContext<{
     isLoading: false,
     getChat: () => null,
     postChat: () => null,
+    restaurants: [],
+    getAllRestaurants: () => null,
     recommendations: [],
     getRecommendations: () => null,
     sysReady: false,
@@ -64,6 +68,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [sysReady, setSysReady] = useState(false);
+    const [restaurants, setRestaurants] = useState<Restaurants[]>([]);
     const [recommendations, setRecommendations] = useState<Recommendations[]>([]);
 
     const baseUrl = "https://8000-idx-restogenie-1735936089471.cluster-7ubberrabzh4qqy2g4z7wgxuw2.cloudworkstations.dev/";
@@ -148,6 +153,20 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     });
             } catch (error) {
                 console.error("Error posting chat", error);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        restaurants,
+        getAllRestaurants: async () => {
+            try {
+                setIsLoading(true);
+
+                const response = await client.get(`${apiPrefix}get-restaurants/`);
+                const newRestaurants = response.data;
+                setRestaurants(newRestaurants);
+            } catch (error: any) {
+                console.error(error);
             } finally {
                 setIsLoading(false);
             }
