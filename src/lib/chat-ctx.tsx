@@ -183,7 +183,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             try {
                 setIsLoading(true);
 
-                const response = await client.post(`${apiPrefix}get-recommendations/`);
+                const response = await client.get(`${apiPrefix}get-recommendations/`);
                 const newRecommendations = response.data;
                     setRecommendations(newRecommendations);
             } catch (error: any) {
