@@ -1,7 +1,7 @@
 import ChatLayout from "./components/chat-layout";
 import { useCookies } from 'react-cookie';
 import { ChatContextProvider } from "@/lib/chat-ctx";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ThemeToggle } from "@/components/mode-toggle-button";
 
 
 const ChatPage = () => {
@@ -19,7 +19,7 @@ const ChatPage = () => {
 					<h1 className="text-xl font-semibold text-gray-900 dark:text-white">
 						Resto Genie
 					</h1>
-					<ModeToggle />
+					<ThemeToggle />
 				</header>
 				<div className="flex flex-1 h-full w-full">
 					<ChatLayout
