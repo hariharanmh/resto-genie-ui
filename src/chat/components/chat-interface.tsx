@@ -12,7 +12,7 @@ const ChatInterface = () => {
 	const { chats, getChat, postChat } = useChatContext();
 	const [message, setMessage] = useState("");
 	const [isThinking, setIsThinking] = useState(false);
-	const initialized = useRef(false)
+	const initialized = useRef(false);
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 	const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,8 +60,7 @@ const ChatInterface = () => {
 				<CardHeader className="sticky top-0 z-10 flex flex-row items-center shrink-0 p-6 bg-white dark:bg-gray-800 border-b shadow-md">
 					<div className="flex items-center space-x-4 w-full">
 						<div>
-							<p className="text-lg font-semibold text-gray-900 dark:text-white">RestoGenie</p>
-							<p className="text-sm text-gray-500 dark:text-gray-400">Your AI-powered restaurant guide</p>
+							<p className="text-lg font-semibold text-gray-900 dark:text-white">Your AI-powered restaurant guide</p>
 						</div>
 					</div>
 				</CardHeader>
