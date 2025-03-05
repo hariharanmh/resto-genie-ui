@@ -12,7 +12,7 @@ interface Chat {
     content: ChatContent;
 }
 
-interface Restaurants {
+export interface Restaurant {
     name: string;
     address?: string;
     rating?: string | number;
@@ -21,11 +21,11 @@ interface Restaurants {
     google_maps_uri?: string;
 }
 
-interface Recommendations {
+export interface Recommendation {
     name: string;
     reason?: string;
     specialties?: string[] | null;
-    match_score?: string | number;
+    match_score?: number;
     dietary_options?: string[] | null;
     ambiance?: string[] | null;
     message?: string;
@@ -38,9 +38,9 @@ const ChatContext = createContext<{
     postChat: (
         message: string,
     ) => void;
-    restaurants: Restaurants[];
+    restaurants: Restaurant[];
     getAllRestaurants: () => void;
-    recommendations: Recommendations[];
+    recommendations: Recommendation[];
     getRecommendations: () => void;
     sysReady: boolean;
     sysReadyCheck: () => void;
@@ -75,8 +75,8 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [sysReady, setSysReady] = useState(false);
-    const [restaurants, setRestaurants] = useState<Restaurants[]>([]);
-    const [recommendations, setRecommendations] = useState<Recommendations[]>([]);
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
     const baseUrl = "https://8000-idx-restogenie-1735936089471.cluster-7ubberrabzh4qqy2g4z7wgxuw2.cloudworkstations.dev/";
     const apiPrefix = "recommendation-engine/";
