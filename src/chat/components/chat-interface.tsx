@@ -15,7 +15,13 @@ const ChatInterface = () => {
 	const initialized = useRef(false);
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 	const chatContainerRef = useRef<HTMLDivElement | null>(null);
-
+	const promptExamples = [
+		"Find the best Italian restaurants in Indiranagar, Bangalore.",
+		"Suggest a good place for sushi near Koramangala.",
+		"Looking for budget-friendly South Indian breakfast spots in Whitefield.",
+		"Best rooftop dining options in MG Road for dinner.",
+		"Where can I get authentic biryani in JP Nagar?",
+	];
 
 	useEffect(() => {
 		if (!initialized.current) {
@@ -101,6 +107,19 @@ const ChatInterface = () => {
 								onKeyDown={handleKeyDown}
 								disabled={isThinking}
 							/>
+							<div className="flex flex-col space-y-2">
+								<div className="flex flex-wrap gap-2">
+									{promptExamples.map((example, index) => (
+										<button
+											key={index}
+											type="button"
+											onClick={() => setMessage(example)}
+											className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full transition-colors"
+										>
+											{example}
+										</button>
+									))}
+								</div>
 							<div className="flex items-center">
 								<Button
 									onClick={handleSend}
@@ -111,6 +130,7 @@ const ChatInterface = () => {
 								>
 									<Send className="w-5 h-5" />
 								</Button>
+								</div>
 							</div>
 						</div>
 					</form>
