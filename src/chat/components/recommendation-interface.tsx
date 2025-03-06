@@ -46,8 +46,8 @@ const RestaurantCard = ({
 	const { recommendation } = restaurant;
 
 	const handleClick = () => {
-		if (restaurant.google_maps_uri) {
-			onClick(restaurant.google_maps_uri);
+		if (restaurant.google_maps_url) {
+			onClick(restaurant.google_maps_url);
 		}
 	};
 
@@ -257,7 +257,7 @@ const RecommendationInterface = () => {
 	}
 
 	const handleOnClick = (url: string) => {
-		return () => openInNewTab(url);
+		return openInNewTab(url);
 	};
 
 	return (

@@ -18,7 +18,7 @@ export interface Restaurant {
     rating?: string | number;
     total_ratings?: string | number;
     is_open?: boolean;
-    google_maps_uri?: string;
+    google_maps_url?: string;
 }
 
 export interface Recommendation {
