@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Restaurant, Recommendation, useChatContext } from "@/lib/chat-ctx";
 import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
@@ -13,13 +14,20 @@ interface RestaurantWithRecommendation extends Restaurant {
 }
 
 // Component for badges
-const BadgeList = ({ items }: { items?: string[] | null }) => {
+const BadgeList = ({ items, className }: { items?: string[] | null, className?: string }) => {
 	if (!items?.length) return null;
 
 	return (
-		<div className="space-x-2 flex flex-wrap">
+		<div className="space-x-2 flex flex-wrap gap-y-2">
 			{items.map((item, idx) => (
-				<Badge variant="outline" key={idx} className="text-xs font-medium">
+				<Badge
+					variant="outline"
+					key={idx}
+					className={cn(
+						"text-xs font-medium px-2 py-1 transition-all hover:scale-105",
+						className
+					)}
+				>
 					{item}
 				</Badge>
 			))}
@@ -46,42 +54,91 @@ const RestaurantCard = ({
 	return (
 		<div className="flex flex-col gap-2 p-2 pt-0">
 			<button
-				className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
+				className="group flex flex-col items-start gap-3 rounded-lg border p-4 text-left text-sm 
+                          transition-all hover:bg-accent hover:shadow-lg transform hover:-translate-y-1 
+                          duration-200 ease-in-out"
 				onClick={handleClick}
 			>
 				{/* Header Section */}
-				<div className="flex w-full flex-col gap-1">
+				<div className="flex w-full flex-col gap-1.5">
 					<div className="flex items-center justify-between">
-						<span className="font-semibold text-gray-900 dark:text-white">
+						<span className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-primary">
 							{restaurant.name}
 						</span>
-						<span className={cn(
-							"flex h-2 w-2 rounded-full",
-							restaurant.is_open ? "bg-green-500" : "bg-red-400"
-						)} />
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger>
+									<span className={cn(
+										"flex h-3 w-3 rounded-full transition-transform duration-200 group-hover:scale-110",
+										restaurant.is_open ? "bg-green-500" : "bg-red-400"
+									)} />
+								</TooltipTrigger>
+								<TooltipContent>
+									{restaurant.is_open ? "Open Now" : "Closed"}
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
 					</div>
 
 					{/* Rating Section */}
-					<div className="text-xs font-medium">
-						⭐ {restaurant.rating} ({restaurant.total_ratings} reviews)
+					<div className="text-sm font-medium text-amber-500">
+						{"⭐".repeat(Math.round(restaurant.rating as number))}
+						<span className="text-gray-600 dark:text-gray-400 ml-1">
+							{restaurant.rating} ({restaurant.total_ratings} reviews)
+						</span>
 					</div>
 				</div>
 
 				{/* Recommendation Details */}
 				{recommendation && (
-					<>
-						<div className="text-xs font-medium">{recommendation.reason}</div>
-						<BadgeList items={recommendation.specialties} />
-						<BadgeList items={recommendation.dietary_options} />
-						<BadgeList items={recommendation.ambiance} />
-						<div className="text-xs text-muted-foreground line-clamp-2">
-							{recommendation.message}
+					<div className="flex flex-col gap-3 w-full">
+						{/* Reason */}
+						<div className="text-sm font-medium text-emerald-600 dark:text-emerald-400 
+                                      bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-md">
+							💡 {recommendation.reason}
 						</div>
-					</>
+
+						{/* Specialties */}
+						{recommendation.specialties && recommendation.specialties?.length > 0 && (
+							<div className="space-y-1">
+								<div className="text-xs font-semibold text-gray-500">👨‍🍳 Specialties</div>
+								<BadgeList items={recommendation.specialties}
+									className="bg-blue-50 text-blue-600 border-blue-200 
+                                                   dark:bg-blue-900/20 dark:text-blue-400" />
+							</div>
+						)}
+
+						{/* Dietary Options */}
+						{recommendation.dietary_options && recommendation.dietary_options?.length > 0 && (
+							<div className="space-y-1">
+								<div className="text-xs font-semibold text-gray-500">🥗 Dietary Options</div>
+								<BadgeList items={recommendation.dietary_options}
+									className="bg-purple-50 text-purple-600 border-purple-200 
+                                                   dark:bg-purple-900/20 dark:text-purple-400" />
+							</div>
+						)}
+
+						{/* Ambiance */}
+						{recommendation.ambiance && recommendation.ambiance?.length > 0 && (
+							<div className="space-y-1">
+								<div className="text-xs font-semibold text-gray-500">✨ Ambiance</div>
+								<BadgeList items={recommendation.ambiance}
+									className="bg-amber-50 text-amber-600 border-amber-200 
+                                                   dark:bg-amber-900/20 dark:text-amber-400" />
+							</div>
+						)}
+
+						{/* Message */}
+						<div className="text-sm text-gray-600 dark:text-gray-300 italic 
+                                      bg-gray-50 dark:bg-gray-700/30 p-2 rounded-md">
+							"{recommendation.message}"
+						</div>
+					</div>
 				)}
 
 				{/* Address */}
-				<div className="text-xs text-muted-foreground line-clamp-2">
+				<div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+					<span>📍</span>
 					{restaurant.address}
 				</div>
 			</button>
