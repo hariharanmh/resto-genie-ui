@@ -72,7 +72,10 @@ const ChatInterface = () => {
 				</CardHeader>
 
 				{/* Chat Area */}
-				<CardContent ref={chatContainerRef} className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+				<CardContent
+					ref={chatContainerRef}
+					className="flex flex-col flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
+				>
 					{chats && chats.map((chat, index) => (
 						<motion.div
 							key={index}
@@ -80,7 +83,7 @@ const ChatInterface = () => {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.3 }}
 							className={cn(
-								"flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-4 py-2 text-sm shadow-md",
+								"flex w-fit max-w-[75%] break-words flex-col gap-2 rounded-lg px-4 py-2 text-sm shadow-md",
 								chat.role === "user"
 									? "ml-auto bg-blue-500 text-white"
 									: "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -120,16 +123,16 @@ const ChatInterface = () => {
 										</button>
 									))}
 								</div>
-							<div className="flex items-center">
-								<Button
-									onClick={handleSend}
-									size="sm"
-									className="ml-auto transition-transform transform hover:scale-105 hover:bg-blue-600"
-									type="button"
-									disabled={isThinking}
-								>
-									<Send className="w-5 h-5" />
-								</Button>
+								<div className="flex items-center">
+									<Button
+										onClick={handleSend}
+										size="sm"
+										className="ml-auto transition-transform transform hover:scale-105 hover:bg-blue-600"
+										type="button"
+										disabled={isThinking}
+									>
+										<Send className="w-5 h-5" />
+									</Button>
 								</div>
 							</div>
 						</div>
