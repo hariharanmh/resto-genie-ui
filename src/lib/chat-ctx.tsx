@@ -105,13 +105,13 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             try {
                 setIsLoading(true);
 
-                const response = await fetch(`${baseUrl}${apiPrefix}chat?prompt=${message}`, {
+                const response = await fetch(`${baseUrl}${apiPrefix}chat`, {
                     method: "POST",
-                    credentials: 'include',
+                    credentials: "include",
                     headers: { 
-                        "Content-Type": "application/json",
-                        "WithCredentials": "true",
+                        "Content-Type": "text/event-stream",
                     },
+                    body: JSON.stringify({ prompt: message }), // Send JSON body
                 });
 
                 if (!response.body) {
@@ -121,10 +121,12 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let accumulatedText = "";
-                let latestMessages = new Map(); // Track the last message for each role
 
-                setChats(prevChats => {
-                    let updatedChats = [...prevChats]; // Keep existing chats before entering the loop
+                setChats((prevChats) => {
+                    let updatedChats = [...prevChats];
+
+                    // Push user message first
+                    updatedChats.push({ role: "user", timestamp: new Date().toISOString(), content: { message } });
 
                     const processChunk = async () => {
                 while (true) {
@@ -132,31 +134,41 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     if (done) break;
 
                     accumulatedText += decoder.decode(value, { stream: true });
-                    const lines = accumulatedText.split("\n");
-                    accumulatedText = lines.pop() || ""; // Save incomplete part
 
-                            lines.forEach(line => {
-                            try {
-                                    const jsonData = JSON.parse(line.trim());
-                                    latestMessages.set(jsonData.role, jsonData); // Store latest message for each role
+                            // Split events properly by line breaks
+                    const lines = accumulatedText.split("\n");
+                            accumulatedText = lines.pop() || ""; // Store partial event for next chunk
+
+                            lines.forEach((line) => {
+                                if (!line.trim()) return;
+                                try {
+                                    // SSE format includes "data: ..." so we need to remove the prefix
+                                    if (line.startsWith("data:")) {
+                                        const jsonString = line.slice(5).trim(); // Remove "data:" prefix and trim whitespace
+                                        const parsedData = JSON.parse(jsonString); // Convert to JSON
+
+                                        const { role, timestamp, content } = parsedData;
+
+                                        if (role === "model") {
+                                            // If last message is from AI, update it, else push a new AI message
+                                            if (updatedChats.length > 0 && updatedChats[updatedChats.length - 1].role === "model") {
+                                                updatedChats[updatedChats.length - 1].content.message = content.message;
+                                            } else {
+                                                updatedChats.push({ role, timestamp, content });
+                                            }
+                                        }
+                                    }
                             } catch (e) {
-                                console.error("Error parsing JSON:", e, line);
+                                    console.error("Error parsing SSE:", e, line);
                                 }
                             });
 
-                            // Merge prevChats and latestMessages
-                            updatedChats = [
-                                ...updatedChats.filter(chat => !latestMessages.has(chat.role)), // Keep old chats except replaced ones
-                                ...Array.from(latestMessages.values()), // Append latest messages
-                            ];
-
-                            setChats(updatedChats); // Update chats in real-time
+                            setChats([...updatedChats]); // Trigger re-render with new state
                         }
                     };
 
-                    processChunk(); // Start processing stream
-
-                    return updatedChats; // Ensures existing chats persist
+                    processChunk();
+                    return updatedChats;
                     });
             } catch (error) {
                 console.error("Error posting chat", error);
