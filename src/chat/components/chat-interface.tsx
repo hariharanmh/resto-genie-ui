@@ -16,12 +16,32 @@ const ChatInterface = () => {
 	const chatEndRef = useRef<HTMLDivElement | null>(null);
 	const chatContainerRef = useRef<HTMLDivElement | null>(null);
 	const promptExamples = [
-		"Find the best Italian restaurants in Indiranagar, Bangalore.",
-		"Suggest a good place for sushi near Koramangala.",
-		"Looking for budget-friendly South Indian breakfast spots in Whitefield.",
-		"Best rooftop dining options in MG Road for dinner.",
-		"Where can I get authentic biryani in JP Nagar?",
+		[
+			"Find the best Italian restaurants in Indiranagar, Bangalore.",
+			"Suggest a good place for sushi near Koramangala.",
+			"Looking for budget-friendly South Indian breakfast spots in Malleshwaram.",
+			"Best rooftop dining options in MG Road for dinner.",
+			"Where can I get authentic biryani in Frazer Town?",
+		],
+		[
+			"Recommend some fine-dining seafood restaurants near Besant Nagar.",
+			"Good vegetarian restaurants for lunch in Mylapore.",
+			"Best street food places in Sowcarpet.",
+			"Where can I find the best filter coffee in Chennai?",
+			"Looking for a romantic dinner spot in ECR with a sea view.",
+		],
+		[
+			"Best traditional Kongunadu cuisine restaurants in RS Puram.",
+			"Suggest a great place for filter coffee and snacks near Town Hall.",
+			"Where can I find the best thattu kadai (street food) experience in Gandhipuram?",
+			"Looking for a cozy café with a great ambiance in Race Course.",
+			"Recommend a good place for Chettinad-style non-veg dishes in Peelamedu.",
+		],
 	];
+	const [selectedPromptList] = useState(() => {
+		const randomListIndex = Math.floor(Math.random() * promptExamples.length);
+		return promptExamples[randomListIndex];
+	});
 
 	useEffect(() => {
 		if (!initialized.current) {
@@ -112,7 +132,7 @@ const ChatInterface = () => {
 							/>
 							<div className="flex flex-col space-y-2">
 								<div className="flex flex-wrap gap-2">
-									{promptExamples.map((example, index) => (
+									{selectedPromptList.map((example, index) => (
 										<button
 											key={index}
 											type="button"
