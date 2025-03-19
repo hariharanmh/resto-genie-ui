@@ -229,10 +229,10 @@ const RecommendationInterface = () => {
 		const fetchData = async () => {
 			try {
 				// Fetch restaurants first
-				await getAllRestaurants();
+				const fetchedRestaurants = await getAllRestaurants();
 
 				// Get recommendations only after restaurants are loaded
-				if (restaurants && restaurants.length > 0) {
+				if (fetchedRestaurants && fetchedRestaurants.length > 0) {
 					await getRecommendations();
 
 					// Optional: Log only in development environment
