@@ -78,7 +78,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
-    const baseUrl = "https://8000-idx-restogenie-1735936089471.cluster-7ubberrabzh4qqy2g4z7wgxuw2.cloudworkstations.dev/";
+    const baseUrl = import.meta.env.VITE_BASE_URL || "https://8000-idx-restogenie-1735936089471.cluster-7ubberrabzh4qqy2g4z7wgxuw2.cloudworkstations.dev/";
     const apiPrefix = "recommendation-engine/";
     const client = axios.create({
         baseURL: baseUrl
