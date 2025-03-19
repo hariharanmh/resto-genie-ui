@@ -39,9 +39,9 @@ const ChatContext = createContext<{
         message: string,
     ) => Promise<void>;
     restaurants: Restaurant[];
-    getAllRestaurants: () => Promise<void>;
+    getAllRestaurants: () => Promise<Restaurant[]>;
     recommendations: Recommendation[];
-    getRecommendations: () => Promise<void>;
+    getRecommendations: () => Promise<Recommendation[]>;
     sysReady: boolean;
     sysReadyCheck: () => Promise<void>;
 }>({
@@ -50,9 +50,9 @@ const ChatContext = createContext<{
     getChat: async () => {},
     postChat: async () => {},
     restaurants: [],
-    getAllRestaurants: async () => {},
+    getAllRestaurants: async () => [],
     recommendations: [],
-    getRecommendations: async () => {},
+    getRecommendations: async () => [],
     sysReady: false,
     sysReadyCheck: async () => {},
 });
@@ -177,29 +177,33 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             }
         },
         restaurants,
-        getAllRestaurants: async (): Promise<void> => {
+        getAllRestaurants: async (): Promise<Restaurant[]> => {
             try {
                 setIsLoading(true);
 
                 const response = await client.get(`${apiPrefix}get-restaurants`);
                 const newRestaurants = response.data;
                 setRestaurants(newRestaurants);
+                return newRestaurants;
             } catch (error: any) {
                 console.error(error);
+                return [];
             } finally {
                 setIsLoading(false);
             }
         },
         recommendations,
-        getRecommendations: async (): Promise<void> => {
+        getRecommendations: async (): Promise<Recommendation[]> => {
             try {
                 setIsLoading(true);
 
                 const response = await client.get(`${apiPrefix}get-recommendations`);
                 const newRecommendations = response.data;
-                    setRecommendations(newRecommendations);
+                setRecommendations(newRecommendations);
+                return newRecommendations;
             } catch (error: any) {
                 console.error(error);
+                return [];
             } finally {
                 setIsLoading(false);
             }
