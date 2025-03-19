@@ -34,27 +34,27 @@ export interface Recommendation {
 const ChatContext = createContext<{
     chats?: Chat[] | null;
     isLoading: boolean;
-    getChat: () => void;
+    getChat: () => Promise<void>;
     postChat: (
         message: string,
-    ) => void;
+    ) => Promise<void>;
     restaurants: Restaurant[];
-    getAllRestaurants: () => void;
+    getAllRestaurants: () => Promise<void>;
     recommendations: Recommendation[];
-    getRecommendations: () => void;
+    getRecommendations: () => Promise<void>;
     sysReady: boolean;
-    sysReadyCheck: () => void;
+    sysReadyCheck: () => Promise<void>;
 }>({
     chats: null,
     isLoading: false,
-    getChat: () => null,
-    postChat: () => null,
+    getChat: async () => {},
+    postChat: async () => {},
     restaurants: [],
-    getAllRestaurants: () => null,
+    getAllRestaurants: async () => {},
     recommendations: [],
-    getRecommendations: () => null,
+    getRecommendations: async () => {},
     sysReady: false,
-    sysReadyCheck: () => null,
+    sysReadyCheck: async () => {},
 });
 
 
@@ -88,7 +88,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const contextValue = {
         chats,
         isLoading,
-        getChat: async () => {
+        getChat: async (): Promise<void> => {
             try {
                 setIsLoading(true);
 
@@ -101,7 +101,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 setIsLoading(false);
             }
         },
-        postChat: async (message: string) => {
+        postChat: async (message: string): Promise<void> => {
             try {
                 setIsLoading(true);
 
@@ -177,7 +177,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             }
         },
         restaurants,
-        getAllRestaurants: async () => {
+        getAllRestaurants: async (): Promise<void> => {
             try {
                 setIsLoading(true);
 
@@ -191,7 +191,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             }
         },
         recommendations,
-        getRecommendations: async () => {
+        getRecommendations: async (): Promise<void> => {
             try {
                 setIsLoading(true);
 
@@ -205,7 +205,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
             }
         },
         sysReady,
-        sysReadyCheck: async () => {
+        sysReadyCheck: async (): Promise<void> => {
             try {
                 await client.get(`system-check`);
                 setSysReady(true);
