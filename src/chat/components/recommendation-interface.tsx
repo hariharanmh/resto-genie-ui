@@ -224,14 +224,16 @@ const RecommendationInterface = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 
 	useEffect(() => {
+		if (!chats || chats.length === 0) return; // Ensure chats exist before running effect
+
 		const fetchData = async () => {
 			try {
 				// Fetch restaurants first
-				getAllRestaurants();
+				await getAllRestaurants();
 
 				// Get recommendations only after restaurants are loaded
-				if (restaurants) {
-					getRecommendations();
+				if (restaurants && restaurants.length > 0) {
+					await getRecommendations();
 
 					// Optional: Log only in development environment
 					if (process.env.NODE_ENV === 'development') {
