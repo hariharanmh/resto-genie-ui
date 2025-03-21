@@ -125,7 +125,12 @@ const ChatInterface = () => {
 					<form className="flex w-full items-center space-x-2">
 						<div className="w-full grid gap-4">
 							{isThinking && (
-								<div className="text-sm text-gray-500 dark:text-gray-400">Thinking...</div>
+								<div className="flex items-center space-x-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+									<span className="animate-pulse">Thinking</span>
+									<span className="animate-bounce [animation-delay:0.1s]">.</span>
+									<span className="animate-bounce [animation-delay:0.2s]">.</span>
+									<span className="animate-bounce [animation-delay:0.3s]">.</span>
+								</div>
 							)}
 							<Textarea
 								className="p-4 rounded-lg border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500"
