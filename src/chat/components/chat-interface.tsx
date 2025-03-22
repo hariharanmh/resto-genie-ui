@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 
 
 const ChatInterface = () => {
-	const { chats, getChat, postChat } = useChatContext();
+	const { chats, getChat, postChat, getAllRestaurants, getRecommendations } = useChatContext();
 	const [message, setMessage] = useState("");
 	const [isThinking, setIsThinking] = useState(false);
 	const initialized = useRef(false);
@@ -48,7 +48,17 @@ const ChatInterface = () => {
 	useEffect(() => {
 		if (!initialized.current) {
 			initialized.current = true;
-			getChat();
+
+			const fetchData = async () => {
+				await getChat(); // First, get all chat messages
+				const fetchedRestaurants = await getAllRestaurants(); // Then fetch restaurants
+
+				if (fetchedRestaurants && fetchedRestaurants.length > 0) {
+					await getRecommendations(); // Finally, fetch recommendations
+				}
+			};
+
+			fetchData(); // Run the function
 		}
 	}, []);
 
