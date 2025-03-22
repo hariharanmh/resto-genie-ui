@@ -34,6 +34,7 @@ export interface Recommendation {
 const ChatContext = createContext<{
     chats?: Chat[] | null;
     isLoading: boolean;
+    isStreaming: boolean;
     getChat: () => Promise<void>;
     postChat: (
         message: string,
@@ -47,14 +48,15 @@ const ChatContext = createContext<{
 }>({
     chats: null,
     isLoading: false,
-    getChat: async () => {},
-    postChat: async () => {},
+    isStreaming: false,
+    getChat: async () => { },
+    postChat: async () => { },
     restaurants: [],
     getAllRestaurants: async () => [],
     recommendations: [],
     getRecommendations: async () => [],
     sysReady: false,
-    sysReadyCheck: async () => {},
+    sysReadyCheck: async () => { },
 });
 
 
@@ -74,6 +76,7 @@ export const useChatContext = () => {
 export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const [chats, setChats] = useState<Chat[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
     const [sysReady, setSysReady] = useState(false);
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
@@ -88,6 +91,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
     const contextValue = {
         chats,
         isLoading,
+        isStreaming,
         getChat: async (): Promise<void> => {
             try {
                 setIsLoading(true);
@@ -104,11 +108,12 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
         postChat: async (message: string): Promise<void> => {
             try {
                 setIsLoading(true);
+                setIsStreaming(true);
 
                 const response = await fetch(`${baseUrl}${apiPrefix}chat`, {
                     method: "POST",
                     credentials: "include",
-                    headers: { 
+                    headers: {
                         "Content-Type": "text/event-stream",
                     },
                     body: JSON.stringify({ prompt: message }), // Send JSON body
@@ -128,35 +133,35 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                     { role: "model", timestamp: new Date().toISOString(), content: { message: "" } } // Placeholder for AI response
                 ]);
 
-                    const processChunk = async () => {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+                const processChunk = async () => {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
 
-                    accumulatedText += decoder.decode(value, { stream: true });
+                        accumulatedText += decoder.decode(value, { stream: true });
 
-                            // Split events properly by line breaks
-                    const lines = accumulatedText.split("\n");
+                        // Split events properly by line breaks
+                        const lines = accumulatedText.split("\n");
                         accumulatedText = lines.pop() || "";
 
                         let latestMessage = "";
 
-                            lines.forEach((line) => {
-                                if (!line.trim()) return;
-                                try {
-                                    // SSE format includes "data: ..." so we need to remove the prefix
-                                    if (line.startsWith("data:")) {
-                                        const jsonString = line.slice(5).trim(); // Remove "data:" prefix and trim whitespace
-                                        const parsedData = JSON.parse(jsonString); // Convert to JSON
+                        lines.forEach((line) => {
+                            if (!line.trim()) return;
+                            try {
+                                // SSE format includes "data: ..." so we need to remove the prefix
+                                if (line.startsWith("data:")) {
+                                    const jsonString = line.slice(5).trim(); // Remove "data:" prefix and trim whitespace
+                                    const parsedData = JSON.parse(jsonString); // Convert to JSON
 
                                     if (parsedData.role === "model") {
                                         latestMessage = parsedData.content.message; // REPLACING instead of appending
-                                        }
                                     }
-                            } catch (e) {
-                                    console.error("Error parsing SSE:", e, line);
                                 }
-                            });
+                            } catch (e) {
+                                console.error("Error parsing SSE:", e, line);
+                            }
+                        });
 
                         if (latestMessage) {
                             setChats((prevChats) => {
@@ -173,8 +178,8 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                                 return prevChats;
                             });
                         }
-                        }
-                    };
+                    }
+                };
 
                 // Wait for all streaming chunks to be processed
                 await processChunk();
@@ -182,6 +187,7 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 console.error("Error posting chat", error);
             } finally {
                 setIsLoading(false);
+                setIsStreaming(false);
             }
         },
         restaurants,

@@ -220,11 +220,11 @@ const RestaurantList = ({
 };
 
 const RecommendationInterface = () => {
-	const { chats, restaurants, recommendations, getAllRestaurants, getRecommendations } = useChatContext();
+	const { isStreaming, chats, restaurants, recommendations, getAllRestaurants, getRecommendations } = useChatContext();
 	const [searchQuery, setSearchQuery] = useState("");
 
 	useEffect(() => {
-		if (!chats || chats.length === 0) return; // Ensure chats exist before running effect
+		if (isStreaming || !chats || chats.length === 0) return; // Ensure chats exist before running effect
 
 		const fetchData = async () => {
 			try {
@@ -234,15 +234,6 @@ const RecommendationInterface = () => {
 				// Get recommendations only after restaurants are loaded
 				if (fetchedRestaurants && fetchedRestaurants.length > 0) {
 					await getRecommendations();
-
-					// Optional: Log only in development environment
-					if (process.env.NODE_ENV === 'development') {
-						console.log({
-							chats,
-							restaurants: restaurants,
-							recommendations: recommendations
-						});
-					}
 				}
 			} catch (error) {
 				console.error('Error fetching data:', error);
@@ -250,7 +241,7 @@ const RecommendationInterface = () => {
 		};
 
 		fetchData();
-	}, [chats]);
+	}, [isStreaming]);
 
 
 	const openInNewTab = (url: string) => {
