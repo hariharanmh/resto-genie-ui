@@ -122,11 +122,11 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                 const decoder = new TextDecoder();
                 let accumulatedText = "";
 
-                setChats((prevChats) => {
-                    let updatedChats = [...prevChats];
-
-                    // Push user message first
-                    updatedChats.push({ role: "user", timestamp: new Date().toISOString(), content: { message } });
+                setChats((prevChats) => [
+                    ...prevChats,
+                    { role: "user", timestamp: new Date().toISOString(), content: { message } }, // User message
+                    { role: "model", timestamp: new Date().toISOString(), content: { message: "" } } // Placeholder for AI response
+                ]);
 
                     const processChunk = async () => {
                 while (true) {
@@ -137,7 +137,9 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
 
                             // Split events properly by line breaks
                     const lines = accumulatedText.split("\n");
-                            accumulatedText = lines.pop() || ""; // Store partial event for next chunk
+                        accumulatedText = lines.pop() || "";
+
+                        let latestMessage = "";
 
                             lines.forEach((line) => {
                                 if (!line.trim()) return;
@@ -147,15 +149,8 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                                         const jsonString = line.slice(5).trim(); // Remove "data:" prefix and trim whitespace
                                         const parsedData = JSON.parse(jsonString); // Convert to JSON
 
-                                        const { role, timestamp, content } = parsedData;
-
-                                        if (role === "model") {
-                                            // If last message is from AI, update it, else push a new AI message
-                                            if (updatedChats.length > 0 && updatedChats[updatedChats.length - 1].role === "model") {
-                                                updatedChats[updatedChats.length - 1].content.message = content.message;
-                                            } else {
-                                                updatedChats.push({ role, timestamp, content });
-                                            }
+                                    if (parsedData.role === "model") {
+                                        latestMessage = parsedData.content.message; // REPLACING instead of appending
                                         }
                                     }
                             } catch (e) {
@@ -163,13 +158,26 @@ export const ChatContextProvider = ({ children }: PropsWithChildren) => {
                                 }
                             });
 
-                            setChats([...updatedChats]); // Trigger re-render with new state
+                        if (latestMessage) {
+                            setChats((prevChats) => {
+                                const lastMessage = prevChats[prevChats.length - 1];
+                                if (lastMessage.role === "model") {
+                                    return [
+                                        ...prevChats.slice(0, -1),
+                                        {
+                                            ...lastMessage,
+                                            content: { message: latestMessage }, // REPLACING the message instead of appending
+                                        },
+                                    ];
+                                }
+                                return prevChats;
+                            });
+                        }
                         }
                     };
 
-                    processChunk();
-                    return updatedChats;
-                    });
+                // Wait for all streaming chunks to be processed
+                await processChunk();
             } catch (error) {
                 console.error("Error posting chat", error);
             } finally {
