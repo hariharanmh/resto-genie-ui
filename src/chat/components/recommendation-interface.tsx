@@ -93,10 +93,12 @@ const RestaurantCard = ({
 				{recommendation && (
 					<div className="flex flex-col gap-3 w-full">
 						{/* Reason */}
-						<div className="text-sm font-medium text-emerald-600 dark:text-emerald-400 
-                                      bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-md">
-							💡 {recommendation.reason}
-						</div>
+						{recommendation.reason && recommendation.reason?.length > 0 && (
+							<div className="text-sm font-medium text-emerald-600 dark:text-emerald-400 
+								bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-md">
+								💡 {recommendation.reason}
+							</div>
+						)}
 
 						{/* Specialties */}
 						{recommendation.specialties && recommendation.specialties?.length > 0 && (
@@ -129,10 +131,12 @@ const RestaurantCard = ({
 						)}
 
 						{/* Message */}
-						<div className="text-sm text-gray-600 dark:text-gray-300 italic 
-                                      bg-gray-50 dark:bg-gray-700/30 p-2 rounded-md">
-							"{recommendation.message}"
-						</div>
+						{recommendation.message && recommendation.message?.length > 0 && (
+							<div className="text-sm text-gray-600 dark:text-gray-300 italic 
+							bg-gray-50 dark:bg-gray-700/30 p-2 rounded-md">
+								"{recommendation.message}"
+							</div>
+						)}
 					</div>
 				)}
 
