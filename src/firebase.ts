@@ -4,14 +4,14 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCMsd5wl0Xo4dCXSK_HkmiIZY-6K9rdT0s",
-  authDomain: "restogenie.firebaseapp.com",
-  databaseURL: "https://restogenie-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "restogenie",
-  storageBucket: "restogenie.firebasestorage.app",
-  messagingSenderId: "36836288075",
-  appId: "1:36836288075:web:85a2f560a1ab83c9a54fce",
-  measurementId: "G-82JBP0QH2E"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
